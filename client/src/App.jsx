@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, Component } from 'react';
 import SearchForm from './components/SearchForm';
 import ResultsDisplay from './components/ResultsDisplay';
+import ApiCallLog from './components/ApiCallLog';
 
 const PAGE_SIZE = 20;
 
@@ -49,6 +50,7 @@ export default function App() {
   const [currentFilters, setCurrentFilters] = useState({ country: 'GB-SCT' });
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+  const [apiCallLog, setApiCallLog] = useState([]);
 
   const fetchAlerts = useCallback(async (filters, loadMore = false) => {
     setIsLoading(true);
@@ -62,13 +64,16 @@ export default function App() {
         params.append('country', `http://data.food.gov.uk/codes/geographies/countries/${filters.country}`);
       }
       if (filters.type) {
-        params.append('type', `http://data.food.gov.uk/food-alerts/def/alert-type/${filters.type}`);
+        params.append('type', `http://data.food.gov.uk/food-alerts/def/${filters.type}`);
       }
       if (filters.hazardCategory) {
         params.append('hazardCategory', filters.hazardCategory);
       }
       if (filters.allergen) {
         params.append('allergen', filters.allergen);
+      }
+      if (filters.since) {
+        params.append('since', filters.since);
       }
 
       // Pagination
@@ -77,13 +82,27 @@ export default function App() {
       params.append('_offset', currentOffset.toString());
       params.append('_sort', '-created');
 
-      const response = await fetch(`/api/alerts?${params.toString()}`);
+      const apiUrl = `/api/alerts?${params.toString()}`;
+      const response = await fetch(apiUrl);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch alerts: ${response.statusText}`);
       }
 
       const data = await response.json();
+
+      // Log the API call
+      setApiCallLog(prev => [...prev, {
+        id: prev.length + 1,
+        timestamp: new Date().toISOString(),
+        endpoint: apiUrl,
+        params: Object.fromEntries(params.entries()),
+        response: {
+          status: response.status,
+          itemCount: data.items?.length || 0,
+          totalResults: data.totalResults || data.items?.length || 0
+        }
+      }]);
 
       // Parse the response - FSA API returns items in 'items' array
       const newAlerts = data.items || [];
@@ -139,14 +158,21 @@ export default function App() {
         <main>
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 
-          <ResultsDisplay
-            alerts={alerts}
-            isLoading={isLoading}
-            error={error}
-            totalCount={totalCount}
-            onLoadMore={handleLoadMore}
-            hasMore={hasMore}
-          />
+          <div className="split-view">
+            <div className="split-view__left">
+              <ResultsDisplay
+                alerts={alerts}
+                isLoading={isLoading}
+                error={error}
+                totalCount={totalCount}
+                onLoadMore={handleLoadMore}
+                hasMore={hasMore}
+              />
+            </div>
+            <div className="split-view__right">
+              <ApiCallLog calls={apiCallLog} />
+            </div>
+          </div>
         </main>
       </div>
     </ErrorBoundary>

@@ -25,10 +25,20 @@ const HAZARD_CATEGORIES = [
   { value: 'Other', label: 'Other' }
 ];
 
+const TIME_PERIODS = [
+  { value: '', label: 'All Time' },
+  { value: '7', label: 'Last 7 Days' },
+  { value: '30', label: 'Last 30 Days' },
+  { value: '90', label: 'Last 90 Days' },
+  { value: '180', label: 'Last 6 Months' },
+  { value: '365', label: 'Last Year' }
+];
+
 export default function SearchForm({ onSearch, isLoading }) {
   const [country, setCountry] = useState('GB-SCT');
   const [alertType, setAlertType] = useState('');
   const [hazardCategory, setHazardCategory] = useState('');
+  const [timePeriod, setTimePeriod] = useState('');
   const [allergens, setAllergens] = useState([]);
   const [selectedAllergen, setSelectedAllergen] = useState('');
   const [showAllergenFilter, setShowAllergenFilter] = useState(false);
@@ -80,6 +90,13 @@ export default function SearchForm({ onSearch, isLoading }) {
     if (selectedAllergen && showAllergenFilter) {
       filters.allergen = selectedAllergen;
     }
+    if (timePeriod) {
+      // Calculate the date X days ago
+      const daysAgo = parseInt(timePeriod, 10);
+      const sinceDate = new Date();
+      sinceDate.setDate(sinceDate.getDate() - daysAgo);
+      filters.since = sinceDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    }
 
     onSearch(filters);
   };
@@ -88,6 +105,7 @@ export default function SearchForm({ onSearch, isLoading }) {
     setCountry('GB-SCT');
     setAlertType('');
     setHazardCategory('');
+    setTimePeriod('');
     setSelectedAllergen('');
     onSearch({ country: 'GB-SCT' });
   };
@@ -146,6 +164,24 @@ export default function SearchForm({ onSearch, isLoading }) {
             {HAZARD_CATEGORIES.map((h) => (
               <option key={h.value} value={h.value}>
                 {h.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label className="form-group__label" htmlFor="timePeriod">
+            Time Period
+          </label>
+          <select
+            id="timePeriod"
+            className="form-group__select"
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+          >
+            {TIME_PERIODS.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
               </option>
             ))}
           </select>

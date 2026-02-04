@@ -70,10 +70,17 @@ app.get('/api/alerts', async (req, res) => {
     // Build query string from request params
     const params = new URLSearchParams();
 
-    // Forward all query parameters
+    // Parameter mapping for FSA API (some params need dot notation)
+    const paramMapping = {
+      'hazardCategory': 'problem.hazardCategory',
+      'allergen': 'problem.allergen'
+    };
+
+    // Forward all query parameters with mapping
     Object.entries(req.query).forEach(([key, value]) => {
       if (value) {
-        params.append(key, value);
+        const mappedKey = paramMapping[key] || key;
+        params.append(mappedKey, value);
       }
     });
 

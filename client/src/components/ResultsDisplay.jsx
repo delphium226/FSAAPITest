@@ -144,7 +144,8 @@ function AlertCard({ alert }) {
   const created = alert.created || alert.modified || alert.dateModified;
   const description = extractDescription(alert);
   const countries = extractCountries(alert);
-  const alertUrl = alert['@id'] || alert.id;
+  // Use alertURL (human-readable FSA page) if available, fallback to API endpoint
+  const alertUrl = alert.alertURL || alert['@id'] || alert.id;
 
   return (
     <article className="alert-card">
