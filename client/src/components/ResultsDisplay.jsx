@@ -1,7 +1,19 @@
 function getAlertTypeClass(type) {
   if (!type) return 'alert-card__type--default';
 
-  const typeStr = type.toLowerCase();
+  // Handle type being an array or object
+  let typeValue = type;
+  if (Array.isArray(type)) {
+    typeValue = type[0];
+  }
+  if (typeof typeValue === 'object' && typeValue !== null) {
+    typeValue = typeValue['@id'] || typeValue.label || typeValue.notation || '';
+  }
+  if (typeof typeValue !== 'string') {
+    return 'alert-card__type--default';
+  }
+
+  const typeStr = typeValue.toLowerCase();
   if (typeStr.includes('allergy') || typeStr.includes('aa')) {
     return 'alert-card__type--allergy';
   }
@@ -17,8 +29,17 @@ function getAlertTypeClass(type) {
 function getAlertTypeLabel(type) {
   if (!type) return 'Alert';
 
+  // Handle type being an array or object
+  let typeValue = type;
+  if (Array.isArray(type)) {
+    typeValue = type[0];
+  }
+  if (typeof typeValue === 'object' && typeValue !== null) {
+    typeValue = typeValue['@id'] || typeValue.label || typeValue.notation || '';
+  }
+
   // Handle both URI format and simple codes
-  const typeStr = typeof type === 'string' ? type : '';
+  const typeStr = typeof typeValue === 'string' ? typeValue : '';
 
   if (typeStr.includes('AA') || typeStr.toLowerCase().includes('allergy')) {
     return 'Allergy Alert';

@@ -1,8 +1,45 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Component } from 'react';
 import SearchForm from './components/SearchForm';
 import ResultsDisplay from './components/ResultsDisplay';
 
 const PAGE_SIZE = 20;
+
+// Error Boundary to catch rendering errors
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    this.setState({ error, errorInfo });
+    console.error('React Error Boundary caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', background: '#fee', border: '2px solid red', margin: '1rem' }}>
+          <h2>Something went wrong!</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem' }}>
+            {this.state.error?.toString()}
+          </pre>
+          <details>
+            <summary>Stack trace</summary>
+            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.75rem' }}>
+              {this.state.errorInfo?.componentStack}
+            </pre>
+          </details>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function App() {
   const [alerts, setAlerts] = useState([]);
@@ -87,29 +124,31 @@ export default function App() {
   }, []);
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1 className="header__title">Food Safety Alerts</h1>
-        <p className="header__subtitle">
-          Search and browse food alerts from Food Standards Scotland
-        </p>
-        <div className="header__badge">
-          Powered by FSA Open Data API
-        </div>
-      </header>
+    <ErrorBoundary>
+      <div className="app">
+        <header className="header">
+          <h1 className="header__title">Food Safety Alerts</h1>
+          <p className="header__subtitle">
+            Search and browse food alerts from Food Standards Scotland
+          </p>
+          <div className="header__badge">
+            Powered by FSA Open Data API
+          </div>
+        </header>
 
-      <main>
-        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+        <main>
+          <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 
-        <ResultsDisplay
-          alerts={alerts}
-          isLoading={isLoading}
-          error={error}
-          totalCount={totalCount}
-          onLoadMore={handleLoadMore}
-          hasMore={hasMore}
-        />
-      </main>
-    </div>
+          <ResultsDisplay
+            alerts={alerts}
+            isLoading={isLoading}
+            error={error}
+            totalCount={totalCount}
+            onLoadMore={handleLoadMore}
+            hasMore={hasMore}
+          />
+        </main>
+      </div>
+    </ErrorBoundary>
   );
 }
