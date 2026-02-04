@@ -108,3 +108,7 @@ Log levels: `[INFO]`, `[ERROR]`, `[REQUEST]`, `[RESPONSE]`, `[FSA API]`
 - **Backend**: Express.js, node-fetch
 - **Styling**: Custom CSS (no frameworks)
 - **API**: Food Standards Agency Open Data API
+
+## API Documentation
+
+For detailed technical documentation about the FSA Food Alerts API, including endpoints, query parameters, response structures, and data codes, see [interfaceSpec.md](./interfaceSpec.md).
