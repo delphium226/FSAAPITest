@@ -1,14 +1,18 @@
 # FSA Food Alerts Test Harness
 
-A user-friendly frontend to query the Food Standards Scotland (FSA) Primary Alerts API, featuring cascading filters and a premium UI design.
+A test harness for the Food Standards Agency (FSA) Food Alerts API, featuring a dark mode UI, comprehensive filters, and an API call log for debugging.
 
 Project connected to [https://github.com/delphium226/FSAAPITest](https://github.com/delphium226/FSAAPITest).
 
 ## Features
 
-- **Cascading Filters**: Country, Alert Type, Hazard Category, and dynamic Allergen filter
+- **Dark Mode UI**: Modern dark theme with clean card-based design
+- **Split View Layout**: Alerts displayed on left, API call log on right
+- **Comprehensive Filters**: Country, Alert Type, Hazard Category, Time Period, and dynamic Allergen filter
+- **Time Period Filter**: Filter alerts from last 7 days, 30 days, 90 days, 6 months, or 1 year
+- **API Call Log**: Real-time table showing all API calls with parameters and responses
 - **Scotland-Focused**: Defaults to showing Scottish food alerts
-- **Premium UI**: Modern card-based design with responsive layout
+- **Detailed Server Logging**: Timestamped logs with request/response tracking and FSA API timing
 - **Pagination**: Load more functionality for browsing large result sets
 - **CORS Proxy**: Express server proxies requests to avoid browser CORS issues
 
@@ -18,18 +22,19 @@ Project connected to [https://github.com/delphium226/FSAAPITest](https://github.
 FSAAPITest/
 ├── server/                 # Express.js proxy server
 │   ├── package.json
-│   └── server.js
+│   └── server.js          # Proxy with detailed logging
 └── client/                 # Vite + React frontend
     ├── package.json
     ├── vite.config.js
     ├── index.html
     └── src/
         ├── main.jsx
-        ├── index.css
-        ├── App.jsx
+        ├── index.css       # Dark mode styles
+        ├── App.jsx         # Main app with split view layout
         └── components/
-            ├── SearchForm.jsx
-            └── ResultsDisplay.jsx
+            ├── SearchForm.jsx      # Filter controls
+            ├── ResultsDisplay.jsx  # Alert cards
+            └── ApiCallLog.jsx      # API call history table
 ```
 
 ## Prerequisites
@@ -80,7 +85,22 @@ Client runs on http://localhost:5173
 - **Country**: Scotland (default), England, Wales, Northern Ireland, or All
 - **Alert Type**: Allergy Alert, Product Recall (PRIN), Food Alert for Action (FAFA)
 - **Hazard Category**: Microbiological, Chemical, Foreign Body, Allergens, Labelling
+- **Time Period**: All Time, Last 7/30/90 Days, Last 6 Months, Last Year
 - **Allergen**: Dynamic dropdown (appears when Allergy Alert is selected)
+
+## Server Logging
+
+The proxy server provides detailed logging with timestamps:
+
+```
+[2026-02-04T13:30:00.000Z] [REQUEST] GET /api/alerts?country=...
+[2026-02-04T13:30:00.001Z] [FSA API] Outgoing request: https://data.food.gov.uk/...
+[2026-02-04T13:30:00.500Z] [FSA API] Response: Status 200 | Duration: 499ms
+[2026-02-04T13:30:00.501Z] [INFO] Alerts fetched successfully
+[2026-02-04T13:30:00.502Z] [RESPONSE] Status: 200 | Duration: 502ms
+```
+
+Log levels: `[INFO]`, `[ERROR]`, `[REQUEST]`, `[RESPONSE]`, `[FSA API]`
 
 ## Technologies
 
