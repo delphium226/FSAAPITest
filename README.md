@@ -109,6 +109,25 @@ Log levels: `[INFO]`, `[ERROR]`, `[REQUEST]`, `[RESPONSE]`, `[FSA API]`
 - **Styling**: Custom CSS (no frameworks)
 - **API**: Food Standards Agency Open Data API
 
+## Deploying to Vercel (Free Hobby Tier)
+
+This application is optimized to be deployed to Vercel for free using a combination of static hosting (for the frontend React app) and Serverless Functions (for the backend Express API proxy).
+
+### Steps to Deploy:
+
+1. **Push your code to GitHub / GitLab / Bitbucket.**
+2. **Import project into Vercel:**
+   - Go to your Vercel Dashboard and click **Add New** > **Project**.
+   - Select the repository for this project.
+3. **Configure the Project Settings:**
+   - **Framework Preset**: Choose **Vite** or **Other**.
+   - **Root Directory**: Keep as `./` (the repository root).
+   - **Build Command**: Set to `npm run build` (this runs the root build script which installs client dependencies and runs `vite build`).
+   - **Output Directory**: Override this setting to `client/dist`.
+4. **Click Deploy.**
+
+Once deployment is complete, Vercel will serve your React SPA and automatically route all `/api/*` endpoints to the serverless function under `/api/index.js` on the same domain.
+
 ## API Documentation
 
 For detailed technical documentation about the FSA Food Alerts API, including endpoints, query parameters, response structures, and data codes, see [interfaceSpec.md](./interfaceSpec.md).
